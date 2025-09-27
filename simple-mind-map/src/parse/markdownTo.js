@@ -43,15 +43,19 @@ const handleList = node => {
 }
 
 // 将markdown转换成节点树
-export const transformMarkdownTo = md => {
+export const transformMarkdownTo = (md, fileName = '文档') => {
   const tree = fromMarkdown(md)
-  let root = {
+  // 创建真正的根节点，使用文件名作为根节点文本
+  let actualRoot = {
+    data: {
+      text: fileName
+    },
     children: []
   }
-  let childrenQueue = [root.children]
-  let currentChildren = root.children
-  let depthQueue = [-1]
-  let currentDepth = -1
+  let childrenQueue = [actualRoot.children]
+  let currentChildren = actualRoot.children
+  let depthQueue = [0] // 根节点层级为0
+  let currentDepth = 0
   for (let i = 0; i < tree.children.length; i++) {
     let cur = tree.children[i]
     if (cur.type === 'heading') {
@@ -109,5 +113,5 @@ export const transformMarkdownTo = md => {
       currentChildren.push(...handleList(cur))
     }
   }
-  return root.children[0]
+  return actualRoot
 }

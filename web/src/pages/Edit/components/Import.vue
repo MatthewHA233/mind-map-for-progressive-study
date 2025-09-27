@@ -128,6 +128,10 @@ export default {
         } else if (type === 'xmind') {
           this.handleXmind(data)
         } else if (type === 'md') {
+          // 从URL中提取文件名
+          const urlParts = fileURL.split('/')
+          const fileName = urlParts[urlParts.length - 1].replace(/\.md$/i, '') || '文档'
+          data.name = fileName + '.md'
           this.handleMd(data)
         }
       } catch (error) {
@@ -239,7 +243,9 @@ export default {
       fileReader.readAsText(file.raw)
       fileReader.onload = async evt => {
         try {
-          let data = markdown.transformMarkdownTo(evt.target.result)
+          // 从文件名中提取根节点名称（去掉.md扩展名）
+          const fileName = file.name ? file.name.replace(/\.md$/i, '') : '文档'
+          let data = markdown.transformMarkdownTo(evt.target.result, fileName)
           this.$bus.$emit('setData', data)
           this.$message.success(this.$t('import.importSuccess'))
         } catch (error) {
